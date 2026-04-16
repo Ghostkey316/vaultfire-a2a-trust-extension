@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ghostkey316/vaultfire-a2a-trust-extension/blob/main/schemas/a2a-trust-extension.json",
+  "title": "A2A Trust Extension — Vaultfire Protocol",
+  "description": "JSON Schema for the 'trust' extension field added to A2A Agent Cards. This schema validates the optional trust metadata added by the Vaultfire Protocol, enabling receiving agents to verify the on-chain trustworthiness of peer agents.",
+  "type": "object",
+  "required": [
+    "protocol",
+    "version",
+    "chain",
+    "chainId",
+    "registryAddress",
+    "agentAddress",
+    "verified",
+    "verifiedAt"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "protocol": {
+      "type": "string",
+      "const": "vaultfire",
+      "description": "Trust protocol identifier. MUST be 'vaultfire' for this extension version."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Protocol version string in MAJOR.MINOR format. This specification defines '1.0'."
+    },
+    "chain": {
+      "type": "string",
+      "enum": ["base", "avalanche", "arbitrum", "polygon"],
+      "description": "Human-readable name of the canonical chain where this agent's trust record is stored."
+    },
+    "chainId": {
+      "type": "integer",
+      "enum": [8453, 43114, 42161, 137],
+      "description": "EIP-155 chain ID corresponding to the 'chain' field. Must match: base=8453, avalanche=43114, arbitrum=42161, polygon=137."
+    },
+    "registryAddress": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{40}$",
+      "description": "Ethereum checksummed address of the Vaultfire Identity Registry contract on the specified chain. Receiving agents MUST verify this matches the canonical address for the given chainId."
+    },
+    "agentAddress": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{40}$",
+      "description": "Ethereum checksummed address of this agent on the specified chain. This is the address that was registered with the Vaultfire Identity Registry."
+    },
+    "streetCred": {
+      "type": "object",
+      "description": "Vaultfire Street Cred composite trust score and breakdown.",
+      "required": ["score", "maxScore", "tier"],
+      "additionalProperties": false,
+      "properties": {
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 95,
+          "description": "Composite trust score from 0 to 95."
+        },
+        "maxScore": {
+          "type": "integer",
+          "const": 95,
+          "description": "Maximum possible score. Always 95 in v1.0."
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["none", "bronze", "silver", "gold", "platinum"],
+          "description": "Named tier derived from score: none(0), bronze(1-30), silver(31-55), gold(56-75), platinum(76-95)."
+        },
+        "breakdown": {
+          "type": "object",
+          "description": "Score component breakdown. Absence of this field is valid if not computable.",
+          "additionalProperties": false,
+          "properties": {
+            "identityRegistered": {
+              "type": "boolean",
+              "description": "true = agent address is registered in the Identity Registry. Worth 30 points."
+            },
+            "hasBond": {
+              "type": "boolean",
+              "description": "true = agent has at least one bond (partnership or accountability). Worth up to 25 points."
+            },
+            "bondActive": {
+              "type": "boolean",
+              "description": "true = at least one bond is currently active. Worth up to 15 points."
+            },
+            "bondTierBonus": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20,
+              "description": "Bonus points based on bond value tier. Range 0-20."
+            },
+            "multipleBonds": {
+              "type": "boolean",
+              "description": "true = agent has more than one active bond. Worth 5 additional points."
+            }
+          }
+        }
+      }
+    },
+    "bonds": {
+      "type": "object",
+      "description": "Summary of the agent's bonds across bond types.",
+      "additionalProperties": false,
+      "properties": {
+        "partnership": {
+          "type": "object",
+          "description": "Partnership bonds — mutual economic stakes between two agents.",
+          "additionalProperties": false,
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of active partnership bonds."
+            },
+            "totalValue": {
+              "type": "string",
+              "description": "Total ETH value of all active partnership bonds, as a decimal string (e.g., '0.01')."
+            }
+          }
+        },
+        "accountability": {
+          "type": "object",
+          "description": "Accountability bond — ETH posted as a commitment that can be slashed for misconduct.",
+          "additionalProperties": false,
+          "properties": {
+            "active": {
+              "type": "boolean",
+              "description": "true = agent has an active accountability bond on this chain."
+            }
+          }
+        }
+      }
+    },
+    "reputation": {
+      "type": "object",
+      "description": "On-chain reputation data from the Vaultfire Reputation contract.",
+      "additionalProperties": false,
+      "properties": {
+        "averageRating": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Average feedback rating from 0 to 100."
+        },
+        "totalFeedbacks": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of feedback submissions received."
+        },
+        "verifiedPercentage": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of feedbacks marked as verified (came from parties with an active bond)."
+        }
+      }
+    },
+    "verified": {
+      "type": "boolean",
+      "description": "true if the agent passed baseline on-chain verification at the time indicated by verifiedAt. Receiving agents SHOULD re-verify this claim independently."
+    },
+    "verifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of the last verification. Receiving agents SHOULD reject claims older than their configured staleness threshold (default: 1 hour)."
+    },
+    "explorer": {
+      "type": "string",
+      "format": "uri",
+      "description": "Block explorer URL for the agentAddress on the specified chain, for human verification."
+    }
+  },
+  "examples": [
+    {
+      "protocol": "vaultfire",
+      "version": "1.0",
+      "chain": "base",
+      "chainId": 8453,
+      "registryAddress": "0x35978DB675576598F0781dA2133E94cdCf4858bC",
+      "agentAddress": "0xA054f831B562e729F8D268291EBde1B2EDcFb84F",
+      "streetCred": {
+        "score": 55,
+        "maxScore": 95,
+        "tier": "silver",
+        "breakdown": {
+          "identityRegistered": true,
+          "hasBond": true,
+          "bondActive": true,
+          "bondTierBonus": 0,
+          "multipleBonds": false
+        }
+      },
+      "bonds": {
+        "partnership": {
+          "count": 1,
+          "totalValue": "0.01"
+        },
+        "accountability": {
+          "active": true
+        }
+      },
+      "reputation": {
+        "averageRating": 85,
+        "totalFeedbacks": 12,
+        "verifiedPercentage": 75
+      },
+      "verified": true,
+      "verifiedAt": "2026-04-15T20:00:00Z",
+      "explorer": "https://basescan.org/address/0xA054f831B562e729F8D268291EBde1B2EDcFb84F"
+    }
+  ]
+}

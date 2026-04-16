@@ -297,6 +297,10 @@ vaultfire-a2a-trust-extension/
 | `@vaultfire/xmtp`          | XMTP messaging with trust verification           | Published |
 | `@vaultfire/x402`          | x402 payment protocol integration               | Published |
 | `@vaultfire/vns`           | Vaultfire Name Service (human-readable addresses)| Published |
+| [`@vaultfire/enterprise`](https://github.com/Ghostkey316/vaultfire-enterprise) | Enterprise IAM bridge — Okta/Azure AD to on-chain trust |
+| [`vaultfire-agents`](https://github.com/Ghostkey316/vaultfire-agents) | 3 reference agents with live on-chain trust verification |
+| [`vaultfire-showcase`](https://github.com/Ghostkey316/vaultfire-showcase) | Why Vaultfire Bonds beat trust scores — live proof |
+| [`vaultfire-whitepaper`](https://github.com/Ghostkey316/vaultfire-whitepaper) | Trust Framework whitepaper — economic accountability for AI |
 
 All packages: https://github.com/Ghostkey316/
 

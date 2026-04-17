@@ -1,7 +1,7 @@
 # A2A Trust Extension — Vaultfire Protocol
 
 
-> **⚠️ Draft Specification** — This A2A Trust Extension is a proposal, not an adopted standard. It has not been reviewed or endorsed by the A2A protocol maintainers or the Linux Foundation. Vaultfire Protocol smart contracts are deployed on mainnet but have **not been formally audited**. The specification, schemas, and reference implementation may change. See [LICENSE](./LICENSE) for warranty disclaimers.
+> **⚠️ Alpha Software** — Vaultfire Protocol is live on mainnet and fully functional, but it is in **alpha**. Smart contracts have **not been formally audited** by a third-party security firm. This A2A Trust Extension is a proposal, not an adopted standard. It has not been reviewed or endorsed by the A2A protocol maintainers or the Linux Foundation. The specification, schemas, and reference implementation may change. See [LICENSE](./LICENSE) for warranty disclaimers.
 
 **Formal specification and reference implementation for adding on-chain trust verification to Google A2A Agent Cards.**
 
